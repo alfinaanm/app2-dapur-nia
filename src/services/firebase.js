@@ -12,6 +12,14 @@ import {
   serverTimestamp,
   onSnapshot,
 } from "firebase/firestore";
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  updateProfile,
+} from "firebase/auth";
 
 // Konfigurasi Firebase dari Environment Variables atau Fallback ke Proyek app2-dapur-nia
 const firebaseConfig = {
@@ -24,9 +32,37 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-CEF826X1FF",
 };
 
-// Inisialisasi Firebase App & Firestore
+// Inisialisasi Firebase App, Firestore, & Auth
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
+export const auth = getAuth(app);
+
+/**
+ * Fungsi Otentikasi Pengguna (Praktik 2: Halaman Masuk Dapur Nia)
+ */
+export async function masukDenganEmail(email, password) {
+  return await signInWithEmailAndPassword(auth, email.trim(), password);
+}
+
+export async function daftarDenganEmail(email, password, displayName) {
+  const userCredential = await createUserWithEmailAndPassword(auth, email.trim(), password);
+  if (displayName && displayName.trim()) {
+    try {
+      await updateProfile(userCredential.user, { displayName: displayName.trim() });
+    } catch (profileError) {
+      console.warn("Gagal memperbarui nama profil:", profileError);
+    }
+  }
+  return userCredential;
+}
+
+export async function keluarAplikasi() {
+  return await signOut(auth);
+}
+
+export function pantauStatusAuth(callback) {
+  return onAuthStateChanged(auth, callback);
+}
 
 // Nama koleksi sesuai Skema-Firestore-Dapur-Nia.md (Wajib huruf kecil, bentuk tunggal)
 export const KOLEKSI_MENU = "menu";

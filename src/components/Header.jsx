@@ -1,6 +1,17 @@
 import React from "react";
 
-export default function Header() {
+export default function Header({ user, onLogout }) {
+  // Ambil nama tampilan pengguna (displayName atau nama sebelum @ di email)
+  const getNamaPanggilan = () => {
+    if (!user) return "";
+    if (user.displayName) return user.displayName;
+    if (user.email) {
+      const bagianAwal = user.email.split("@")[0];
+      return bagianAwal.charAt(0).toUpperCase() + bagianAwal.slice(1);
+    }
+    return "Nia";
+  };
+
   return (
     <header className="brand-header">
       <div className="brand-left">
@@ -13,9 +24,24 @@ export default function Header() {
       </div>
 
       <div className="brand-right">
-        <span className="domain-badge" title="URL Publik Netlify">
-          app2-dapur-nia.netlify.app
-        </span>
+        {user ? (
+          <div className="user-auth-header-bar">
+            <span className="user-display-name">{getNamaPanggilan()}</span>
+            <span className="user-header-divider">·</span>
+            <button
+              type="button"
+              className="btn-header-logout"
+              onClick={onLogout}
+              title="Keluar dari akun"
+            >
+              Keluar
+            </button>
+          </div>
+        ) : (
+          <span className="domain-badge" title="URL Publik Netlify">
+            app2-dapur-nia.netlify.app
+          </span>
+        )}
       </div>
     </header>
   );
