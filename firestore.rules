@@ -1,0 +1,35 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Validasi aturan skema dan invariant koleksi menu
+    function isValidMenu(data) {
+      return data.nama is string &&
+             data.nama.trim().size() >= 1 &&
+             data.nama.size() <= 60 &&
+             data.harga is number &&
+             data.harga >= 0 &&
+             data.sisa_porsi is number &&
+             data.sisa_porsi >= 0 &&
+             data.tersedia is bool;
+    }
+
+    // Koleksi menu
+    match /menu/{menuId} {
+      allow read: if true;
+      allow create: if isValidMenu(request.resource.data);
+      allow update: if isValidMenu(request.resource.data);
+      allow delete: if true;
+    }
+
+    // Koleksi pelanggan & pesanan (disiapkan untuk sesi lanjutan)
+    match /pelanggan/{pelangganId} {
+      allow read, write: if true;
+    }
+
+    match /pesanan/{pesananId} {
+      allow read, write: if true;
+    }
+  }
+}
