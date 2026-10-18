@@ -19,6 +19,8 @@ import {
   signOut,
   onAuthStateChanged,
   updateProfile,
+  GoogleAuthProvider,
+  signInWithPopup,
 } from "firebase/auth";
 
 // Konfigurasi Firebase dari Environment Variables atau Fallback ke Proyek app2-dapur-nia
@@ -58,6 +60,13 @@ export async function daftarDenganEmail(email, password, displayName) {
 
 export async function keluarAplikasi() {
   return await signOut(auth);
+}
+
+const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({ prompt: "select_account" });
+
+export async function masukDenganGoogle() {
+  return await signInWithPopup(auth, googleProvider);
 }
 
 export function pantauStatusAuth(callback) {
